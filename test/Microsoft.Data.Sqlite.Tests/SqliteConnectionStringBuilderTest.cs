@@ -60,6 +60,14 @@ public class SqliteConnectionStringBuilderTest
         Assert.True(builder.RecursiveTriggers);
     }
 
+    [Fact]
+    public void Ctor_parses_VirtualFileSystem()
+    {
+        var builder = new SqliteConnectionStringBuilder("VirtualFileSystem=abc");
+
+        Assert.Equal("abc", builder.VirtualFileSystem);
+    }
+
     [Theory]
     [InlineData("Default Timeout")]
     [InlineData("Command Timeout")]
@@ -127,6 +135,16 @@ public class SqliteConnectionStringBuilderTest
     }
 
     [Fact]
+    public void VirtualFileSystem_works()
+    {
+        var builder = new SqliteConnectionStringBuilder();
+
+        builder.VirtualFileSystem = "abc";
+
+        Assert.Equal("abc", builder.VirtualFileSystem);
+    }
+
+    [Fact]
     public void Mode_defaults_to_ReadWriteCreate()
         => Assert.Equal(SqliteOpenMode.ReadWriteCreate, new SqliteConnectionStringBuilder().Mode);
 
@@ -141,6 +159,10 @@ public class SqliteConnectionStringBuilderTest
     [Fact]
     public void DefaultTimeout_defaults_to_30()
         => Assert.Equal(30, new SqliteConnectionStringBuilder().DefaultTimeout);
+
+    [Fact]
+    public void VirtualFileSystem_defaults_to_empty()
+        => Assert.Equal("", new SqliteConnectionStringBuilder().VirtualFileSystem);
 
     [Fact]
     public void Keys_works()
@@ -165,7 +187,7 @@ public class SqliteConnectionStringBuilderTest
         var values = (ICollection<object>)new SqliteConnectionStringBuilder().Values;
 
         Assert.True(values.IsReadOnly);
-        Assert.Equal(8, values.Count);
+        Assert.Equal(9, values.Count);
     }
 
     [Fact]

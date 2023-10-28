@@ -31,6 +31,7 @@ namespace Microsoft.Data.Sqlite
         private const string DefaultTimeoutKeyword = "Default Timeout";
         private const string CommandTimeoutKeyword = "Command Timeout";
         private const string PoolingKeyword = "Pooling";
+        private const string VirtualFileSystemKeyword = "Virtual File System";
 
         private enum Keywords
         {
@@ -41,7 +42,8 @@ namespace Microsoft.Data.Sqlite
             ForeignKeys,
             RecursiveTriggers,
             DefaultTimeout,
-            Pooling
+            Pooling,
+            VirtualFileSystem,
         }
 
         private static readonly IReadOnlyList<string> _validKeywords;
@@ -55,10 +57,11 @@ namespace Microsoft.Data.Sqlite
         private bool _recursiveTriggers;
         private int _defaultTimeout = 30;
         private bool _pooling = true;
+        private string? _virtualFileSystem = null;
 
         static SqliteConnectionStringBuilder()
         {
-            var validKeywords = new string[8];
+            var validKeywords = new string[9];
             validKeywords[(int)Keywords.DataSource] = DataSourceKeyword;
             validKeywords[(int)Keywords.Mode] = ModeKeyword;
             validKeywords[(int)Keywords.Cache] = CacheKeyword;
@@ -67,6 +70,7 @@ namespace Microsoft.Data.Sqlite
             validKeywords[(int)Keywords.RecursiveTriggers] = RecursiveTriggersKeyword;
             validKeywords[(int)Keywords.DefaultTimeout] = DefaultTimeoutKeyword;
             validKeywords[(int)Keywords.Pooling] = PoolingKeyword;
+            validKeywords[(int)Keywords.VirtualFileSystem] = VirtualFileSystemKeyword;
             _validKeywords = validKeywords;
 
             _keywords = new Dictionary<string, Keywords>(11, StringComparer.OrdinalIgnoreCase)
@@ -79,6 +83,7 @@ namespace Microsoft.Data.Sqlite
                 [RecursiveTriggersKeyword] = Keywords.RecursiveTriggers,
                 [DefaultTimeoutKeyword] = Keywords.DefaultTimeout,
                 [PoolingKeyword] = Keywords.Pooling,
+                [VirtualFileSystemKeyword] = Keywords.VirtualFileSystem,
 
                 // aliases
                 [FilenameKeyword] = Keywords.DataSource,
@@ -215,6 +220,16 @@ namespace Microsoft.Data.Sqlite
         {
             get => _pooling;
             set => base[PoolingKeyword] = _pooling = value;
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating the Virtual File System to be used when opening the connection.
+        /// </summary>
+        /// <value>A value indicating the Virtual File System to be used when opening the connection.</value>
+        public string? VirtualFileSystem
+        {
+            get => _virtualFileSystem;
+            set => base[VirtualFileSystemKeyword] = _virtualFileSystem = value;
         }
 
         /// <summary>
@@ -412,6 +427,9 @@ namespace Microsoft.Data.Sqlite
                 case Keywords.Pooling:
                     return Pooling;
 
+                case Keywords.VirtualFileSystem:
+                    return VirtualFileSystem;
+
                 default:
                     Debug.Fail("Unexpected keyword: " + index);
                     return null;
@@ -457,6 +475,10 @@ namespace Microsoft.Data.Sqlite
 
                 case Keywords.Pooling:
                     _pooling = true;
+                    return;
+
+                case Keywords.VirtualFileSystem:
+                    _virtualFileSystem = string.Empty;
                     return;
 
                 default:
