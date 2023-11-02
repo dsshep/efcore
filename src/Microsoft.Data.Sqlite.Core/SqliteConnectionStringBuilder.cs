@@ -478,7 +478,7 @@ namespace Microsoft.Data.Sqlite
                     return;
 
                 case Keywords.VirtualFileSystem:
-                    _virtualFileSystem = string.Empty;
+                    _virtualFileSystem = null;
                     return;
 
                 default:
